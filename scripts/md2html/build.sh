@@ -9,25 +9,39 @@ mkdir -p deploy/oas
 mkdir -p deploy/js
 
 cd scripts/md2html
-mkdir -p history
-git show c740e950d:MAINTAINERS.md > history/MAINTAINERS_v2.0.md
-cp -p js/* ../../deploy/js 2> /dev/null
-cp -p markdown/* ../../deploy/ 2> /dev/null
 
-node md2html.js --respec --maintainers ./history/MAINTAINERS_v2.0.md ../../versions/2.0.md > ../../deploy/oas/v2.0.html
+cp -p ../../node_modules/respec/builds/respec-w3c.* ../../deploy/js/
 
 latest=`git describe --abbrev=0 --tags`
 latestCopied=none
-for filename in ../../versions/[3456789].*.md ; do
+lastMinor="-"
+for filename in $(ls -1 ../../versions/[23456789].*.md | sort -r) ; do
+  if [[ ${filename} == *-editors.md ]];then
+    continue
+  fi
+
   version=$(basename "$filename" .md)
-  node md2html.js --respec --maintainers ../../MAINTAINERS.md ${filename} > ../../deploy/oas/v$version.html
+  minorVersion=${version:0:3}
+  tempfile=../../deploy/oas/v$version-tmp.html
+  echo -e "\n=== v$version ==="
+
+  node md2html.js --maintainers ../../versions/$version-editors.md ${filename} > $tempfile
+  npx respec --use-local --src $tempfile --out ../../deploy/oas/v$version.html
+  rm $tempfile
+
   if [ $version = $latest ]; then
     if [[ ${version} != *"rc"* ]];then
       # version is not a Release Candidate
-      cp -p ../../deploy/oas/v$version.html ../../deploy/oas/latest.html
+      ( cd ../../deploy/oas && ln -sf v$version.html latest.html )
       latestCopied=v$version
     fi
+  fi
+
+  if [ ${minorVersion} != ${lastMinor} ] && [ ${minorVersion} != 2.0 ]; then
+    ( cd ../../deploy/oas && ln -sf v$version.html v$minorVersion.html )
+    lastMinor=$minorVersion
   fi
 done
 echo Latest tag is $latest, copied $latestCopied to latest.html
 
+rm ../../deploy/js/respec-w3c.*
