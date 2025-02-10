@@ -15,19 +15,15 @@ The OpenAPI Specification does not require rewriting existing APIs. It does not 
 
 This GitHub project is the starting point for OpenAPI. Here you will find the information you need about the OpenAPI Specification, simple examples of what it looks like, and some general information regarding the project.
 
-## Current Version - 3.1.0
+## Versions
 
-The current version of the OpenAPI specification is [OpenAPI Specification 3.1.0](versions/3.1.0.md).
+This repository contains [the Markdown sources](versions) for [all published OpenAPI Specification versions](https://spec.openapis.org/). For release notes and release candidate versions, refer to the [releases page](releases).
 
-### Previous Versions
-
-This repository also contains all [previous versions](versions).
-
-Each folder in this repository, such as [examples](examples) and [schemas](schemas), should contain folders pertaining to the current and previous versions of the specification.
+Each folder in this repository, such as [schemas](schemas) and [tests](tests), should contain folders pertaining to the current and previous versions of the specification.
 
 ## See It in Action
 
-If you just want to see it work, check out the [list of current examples](examples).
+If you just want to see it work, check out the [list of current examples](https://learn.openapis.org/examples/).
 
 ## Tools and Libraries
 
@@ -37,18 +33,19 @@ Looking to see how you can create your own OpenAPI definition, present it, or ot
 ## Participation
 
 The current process for developing the OpenAPI Specification is described in 
-[Development Guidelines](DEVELOPMENT.md).
+the [Contributing Guidelines](CONTRIBUTING.md).
+
 Developing the next version of the OpenAPI Specification is guided by the [Technical Steering Committee (TSC)](https://www.openapis.org/participate/how-to-contribute/governance#TDC). This group of committers bring their API expertise, incorporate feedback from the community, and expand the group of committers as appropriate. All development activity on the future specification will be performed as features and merged into this branch. Upon release of the future specification, this branch will be merged to `main`.
 
 The TSC holds weekly web conferences to review open pull requests and discuss open issues related to the evolving OpenAPI Specification. Participation in weekly calls and scheduled working sessions is open to the community. You can view the entire OpenAPI [technical meeting calendar](https://calendar.google.com/calendar/u/0/embed?src=c_fue82vsncog6ahhjvuokjo8qsk@group.calendar.google.com) online.
 
 The OpenAPI Initiative encourages participation from individuals and companies alike. If you want to participate in the evolution of the OpenAPI Specification, consider taking the following actions:
 
-* Review the [current specification](versions/3.1.0.md). The human-readable markdown file _is the source of truth_ for the specification.
-* Review the [development](DEVELOPMENT.md) process so you understand how the spec is evolving.
-* Check the [issues](https://github.com/OAI/OpenAPI-Specification/issues) and [pull requests](https://github.com/OAI/OpenAPI-Specification/pulls) to see if someone has already documented your idea or feedback on the specification. You can follow an existing conversation by subscribing to the existing issue or PR.
+* Review the specification [markdown sources](versions) and [authoritative _source-of-truth_ HTML renderings](https://spec.openapis.org/), including full credits and citations.
+* Review the [contributing](CONTRIBUTING.md) process so you understand how the spec is evolving.
+* Check the [discussions](https://github.com/OAI/OpenAPI-Specification/discussions), [issues](https://github.com/OAI/OpenAPI-Specification/issues) and [pull requests](https://github.com/OAI/OpenAPI-Specification/pulls) to see if someone has already documented your idea or feedback on the specification. You can follow an existing conversation by subscribing to the existing issue or PR.
 * Subscribe to an open issue a day (or a week) in your inbox via [CodeTriage.com](https://www.codetriage.com/oai/openapi-specification).
-* Create an issue to describe a new concern. If possible, propose a solution.
+* Create a discussion to describe a new concern, ideally with clear explanations of related use cases.
 
 Not all feedback can be accommodated, and there may be solid arguments for or against a change being appropriate for the specification.
 

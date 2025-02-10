@@ -2,32 +2,81 @@
 
 # Author: @MikeRalphson
 
-# run this script from the root of the repo. It is designed to be run by a GitHub workflow.
+# run this script from the root of the repo
+# It is designed to be run by a GitHub workflow
+
+# Usage: build.sh [version | "latest" | "src"]
+# When run with no arguments, it builds artifacts for all published specification versions.
+# It may also be run with a specific version argument, such as "3.1.1" or "latest"
+# Finally, it may be run with "src" to build "src/oas.md"
+#
 # It contains bashisms
 
-mkdir -p deploy/oas
-mkdir -p deploy/js
+if [ "$1" = "src" ]; then
+  deploydir="deploy-preview"
+else
+  deploydir="deploy/oas"
+fi
 
-cd scripts/md2html
-mkdir -p history
-git show c740e950d:MAINTAINERS.md > history/MAINTAINERS_v2.0.md
-cp -p js/* ../../deploy/js 2> /dev/null
-cp -p markdown/* ../../deploy/ 2> /dev/null
+mkdir -p $deploydir/js
+mkdir -p $deploydir/temp
+cp -p node_modules/respec/builds/respec-w3c.* $deploydir/js/
 
-node md2html.js --respec --maintainers ./history/MAINTAINERS_v2.0.md ../../versions/2.0.md > ../../deploy/oas/v2.0.html
+latest=$(git describe --abbrev=0 --tags)
 
-latest=`git describe --abbrev=0 --tags`
-latestCopied=none
-for filename in ../../versions/[3456789].*.md ; do
-  version=$(basename "$filename" .md)
-  node md2html.js --respec --maintainers ../../MAINTAINERS.md ${filename} > ../../deploy/oas/v$version.html
+if [ -z "$1" ]; then
+  specifications=$(ls -1 versions/[23456789].*.md | grep -v -e "\-editors" | sort -r)
+elif [ "$1" = "latest" ]; then
+  specifications=$(ls -1 versions/$latest.md)
+elif [ "$1" = "src" ]; then
+  specifications="src/oas.md"
+else
+  specifications=$(ls -1 versions/$1.md)
+fi
+
+latestCopied="none"
+lastMinor="-"
+
+for specification in $specifications; do
+  version=$(basename $specification .md)
+
+  if [ "$1" = "src" ]; then
+    destination="$deploydir/$version.html"
+    maintainers="EDITORS.md"
+  else
+    destination="$deploydir/v$version.html"
+    maintainers="$(dirname $specification)/$version-editors.md"
+  fi
+
+  minorVersion=${version:0:3}
+  tempfile="$deploydir/temp/$version.html"
+
+  echo === Building $version to $destination
+
+  node scripts/md2html/md2html.js --maintainers $maintainers $specification > $tempfile
+  npx respec --use-local --src $tempfile --out $destination
+  rm $tempfile
+
+  echo === Built $destination
+
   if [ $version = $latest ]; then
-    if [[ ${version} != *"rc"* ]];then
+    if [[ ${version} != *"rc"* ]]; then
       # version is not a Release Candidate
-      cp -p ../../deploy/oas/v$version.html ../../deploy/oas/latest.html
-      latestCopied=v$version
+      ln -sf $(basename $destination) $deploydir/latest.html
+      latestCopied="v$version"
     fi
   fi
-done
-echo Latest tag is $latest, copied $latestCopied to latest.html
 
+  if [ ${minorVersion} != ${lastMinor} ] && [[ ${minorVersion} =~ ^[3-9] ]]; then
+    ln -sf $(basename $destination) $deploydir/v$minorVersion.html
+    lastMinor=$minorVersion
+  fi
+done
+
+if [ "$latestCopied" != "none" ]; then
+  echo Latest tag is $latest, copied $latestCopied to latest.html
+fi
+
+rm $deploydir/js/respec-w3c.*
+rmdir $deploydir/js
+rmdir $deploydir/temp
